@@ -12,13 +12,17 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Hypergraph;
 import edu.uci.ics.jung.graph.UndirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
-
+import org.json.simple.*;
+import org.json.simple.parser.*;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -63,7 +67,8 @@ public class Sociopatterns {
     
     //SyntheticData
     Graph g1,g2,g3,g4,g5,g6,g7,g8,g9,g10;
- 
+
+    Graph[] msrc21;
     
     static int n = 0; 		//Number of nodes
     static int a = 0; 		//Number of attributes 
@@ -158,6 +163,9 @@ public class Sociopatterns {
 //	    	readGraph8N();
 //	    	readGraph10N();
     	}
+    	else if (dname.equals("msrc21")) {
+    		readMSRC21();
+		}
     	else {
     		System.out.println("Please, check the name of the dataset. It is incorrect!");
     	}
@@ -596,7 +604,66 @@ public class Sociopatterns {
     	System.out.println("Read Flickr - Layer 1");
     }
     
-    
+    public void readMSRC21() {
+		// defaults
+		graphs = 1;
+		int graphsTotal = 563;
+		dim = 0;
+		// dimensionality of the dataset?
+		//iter = 30;
+		//extraiter = 5;
+
+		this.msrc21 = new Graph[graphsTotal];
+
+		for (int j = 0; j < graphsTotal; ++j) {
+			UndirectedSparseMultigraph<Integer, MyEdge> msrcEdge = new UndirectedSparseMultigraph<Integer, MyEdge>();
+			// read edge list from json
+			JSONParser parser = new JSONParser();
+			String filename = "msrc21_" + j + ".json";
+			try (Reader reader = new FileReader("./data/msrc21/"+filename)) {
+
+				JSONObject data = (JSONObject) parser.parse(reader);
+
+				JSONObject graph = (JSONObject) data.get("graph");
+				//System.out.println(graph);
+
+				JSONArray edges = (JSONArray) data.get("links");
+				Iterator<JSONObject> objectIterator = edges.iterator();
+
+				int edgeCounter = 0;
+
+				while (objectIterator.hasNext()) {
+					JSONObject sourceTargetEdge = objectIterator.next();
+					Long from = (Long) sourceTargetEdge.get("source");
+					Long to = (Long) sourceTargetEdge.get("target");
+
+					msrcEdge.addEdge(new MyEdge(edgeCounter, 1.0), (from.intValue()), (to.intValue()), EdgeType.UNDIRECTED);
+					edgeCounter++;
+				}
+				this.msrc21[j] = msrcEdge;
+				//System.out.println(msrcEdge);
+				//System.out.println(edges);
+				/*double[][] d = read();
+
+				// needs to be an edge list or something
+
+				// add edges to graph
+				int edgeCounter = 0;
+
+				for (int i = 0; i < d.length; i++) {
+					if (d[i][0] < n && d[i][1] < n) {
+						msrcEdge.addEdge(new MyEdge(edgeCounter, 1.0), ((int) (d[i][0])), ((int) (d[i][1])), EdgeType.UNDIRECTED);
+						edgeCounter++;
+					}
+				}*/
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+	}
     
     //ACM - IDs, Attributes, and PAP graph
     public void readAcmPAP() {
@@ -908,4 +975,8 @@ public class Sociopatterns {
     	   }
        System.out.println("Read Synthetic-A G2");
     }
+
+	public Graph[] getMSRC21Graphs() {
+    	return this.msrc21;
+	}
 }

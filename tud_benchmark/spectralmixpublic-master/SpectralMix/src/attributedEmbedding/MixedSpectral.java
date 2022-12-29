@@ -96,6 +96,9 @@ public class MixedSpectral {
         double maxWeight = 0.0;
         int maxIndex = -1;
         for (int i = 0; i < g.length; i++) {
+            System.out.println(i);
+            System.out.println(g.length);
+            System.out.println(g[0]);
             Collection<MyEdge> e = g[i].getEdges();
             for (MyEdge ee : e) {
                 overallWeight[i] += ee.getWeight();
@@ -122,7 +125,9 @@ public class MixedSpectral {
         for (int i = 0; i < numObj; i++) {
             for (int j = 0; j < g.length; j++) {
                 Collection c = g[j].getSuccessors(i);
-                sumWeights[i] += (c.size() * weightFactors[j]); //check this for directed graphs    
+                if (c != null) {
+                    sumWeights[i] += (c.size() * weightFactors[j]); //check this for directed graphs
+                }
             }
             for (int j = 0; j < numAtt; j++) {
                 if (attributes[i][j] != -1) {
@@ -347,13 +352,14 @@ public class MixedSpectral {
     //test on synthetic data if this gives the same value
     private double obj() {
         double[] cost = new double[g.length + numAtt];
-        
+        // throws out of bounds - but why?
         for (int i = 0; i < g.length; i++) {
             Collection<MyEdge> edges = g[i].getEdges();
             for (MyEdge e : edges) {
                 Pair<Integer> p = g[i].getEndpoints(e);
                 double dist = 0.0;
                 for (int l = 0; l < d; l++) {
+                    System.out.println(p);
                     dist += weightFactors[i] * (e.getWeight() * (objCoord[p.getFirst()][l] - objCoord[p.getSecond()][l]) * (objCoord[p.getFirst()][l] - objCoord[p.getSecond()][l]));
                 }
                 cost[i] += dist;

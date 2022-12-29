@@ -25,12 +25,12 @@ public class MixedSpectralMain {
 //       dg.disagreementBetweenGraphAndAttributes();
     	 	
 //    	String dataset = "imdb";
-    	String dataset = args[0].toString();
-    	System.out.println("Dataset: " + dataset);
-//        String dataset = "flickr"; //flickr || acm || imdb || dblp || brainA || brainH || karate 
-              
-        
-        Sociopatterns sp = new Sociopatterns();
+//    	String dataset = args[0].toString();
+        String dataset = "msrc21"; //"flickr"; //flickr || acm || imdb || dblp || brainA || brainH || karate
+		System.out.println("Dataset: " + dataset);
+
+
+		Sociopatterns sp = new Sociopatterns();
         sp.readData(dataset);
         
         int noG = sp.getG(); //uncomment and specify number of graphs if you use datasets other than BrainNetworks
@@ -92,14 +92,16 @@ public class MixedSpectralMain {
 	        measuredDiary[1] = sp.getGraphA1();
 			System.out.println("Read Synthetic Data Network - A");
 		}
-
+		else if (dataset.equals("msrc21")) {
+			measuredDiary[0] = sp.getMSRC21Graphs()[0];
+		}
 
         //For synthetic dataset
         //measuredDiary[0] = dg.g; 
 
         int noAtts = sp.getA(); 		//attributes number  
-        int[][] attA = sp.getAllAtt(); 	//if dataset has attributes, get values for all attributes
-//        int[][] attA = null; 			//if dataset does not have attributes
+        //int[][] attA = sp.getAllAtt(); 	//if dataset has attributes, get values for all attributes
+        int[][] attA = null; 			//if dataset does not have attributes
                      
         boolean[] weighted = new boolean[noG];
                
@@ -107,13 +109,14 @@ public class MixedSpectralMain {
         	weighted[i] = false;            //set if the edges have weights or not
         }
         
-        dimensionality = sp.getDim();
-        iter = sp.getIterations();
-        extraiter = sp.getExtraIter();
+        dimensionality = 10; //sp.getDim();
+        iter = 30; //sp.getIterations();
+        extraiter = 5;// sp.getExtraIter();
       
         System.out.println("Start running, "+dataset+", for dimensionality d = "+dimensionality+".");
         long startTime = System.nanoTime();
-	        
+        System.out.println(measuredDiary[0]);
+		System.out.println(measuredDiary[0].getSuccessors(0));
         MixedSpectral ms = new MixedSpectral(dataset, measuredDiary, weighted, attA, noAtts, dimensionality, iter, extraiter, sp.getClassId()); 
 	    ms.init(0);
 	    ms.run();
