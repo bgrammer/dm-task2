@@ -39,7 +39,8 @@ public class MixedSpectralMain {
         int extraiter = 0;
                 
         Graph[] measuredDiary = new Graph[noG];
-        
+        // we only have 1 graph
+
         if (dataset.equals("flickr")) {
         	//Flickr set dimensionality to 11 and iter = 30, extraIter = 5
         	measuredDiary[0] = sp.getFlickr0();
