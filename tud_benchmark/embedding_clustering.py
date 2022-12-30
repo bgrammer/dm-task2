@@ -1,7 +1,7 @@
 from tensorflow.keras.utils import to_categorical
 from sklearn import preprocessing
 from sklearn import svm
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans,SpectralClustering
 from sklearn.metrics import normalized_mutual_info_score
 import numpy as np
 import sklearn
@@ -75,3 +75,14 @@ def svm(X,Y,train_split = 0.8, runs = 10, kernel="rbf"):
         acc = svm.score(X_test,Y_test)
         accuracies.append(acc)
     return np.mean(accuracies)
+
+def spectral_clustering_batch(X,classes,affinity='precomputed',n_clusters = 20,runs = 20):
+    nmis = []
+    for i in range(0,runs):
+        clustering = SpectralClustering(n_clusters=n_clusters,
+            assign_labels='discretize',
+            affinity=affinity,
+            random_state=0).fit(X)
+        nmi = normalized_mutual_info_score(clustering.labels_,classes)
+
+    return np.mean(nmis)
