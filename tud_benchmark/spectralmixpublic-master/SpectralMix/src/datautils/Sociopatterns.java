@@ -69,8 +69,9 @@ public class Sociopatterns {
     Graph g1,g2,g3,g4,g5,g6,g7,g8,g9,g10;
 
     Graph[] msrc21;
-    
-    static int n = 0; 		//Number of nodes
+    int[][][] msrc21atts = new int[563][][];
+
+	static int n = 0; 		//Number of nodes
     static int a = 0; 		//Number of attributes 
     
     static int dim = 0; 	//desired dimensionality
@@ -609,9 +610,7 @@ public class Sociopatterns {
 		graphs = 1;
 		int graphsTotal = 563;
 		dim = 0;
-		// dimensionality of the dataset?
-		//iter = 30;
-		//extraiter = 5;
+		a = 1;
 
 		this.msrc21 = new Graph[graphsTotal];
 
@@ -629,7 +628,7 @@ public class Sociopatterns {
 
 				JSONArray edges = (JSONArray) data.get("links");
 				Iterator<JSONObject> objectIterator = edges.iterator();
-
+				// node number, attribute
 				int edgeCounter = 0;
 
 				while (objectIterator.hasNext()) {
@@ -640,22 +639,22 @@ public class Sociopatterns {
 					msrcEdge.addEdge(new MyEdge(edgeCounter, 1.0), (from.intValue()), (to.intValue()), EdgeType.UNDIRECTED);
 					edgeCounter++;
 				}
+
+				JSONArray nodes = (JSONArray) data.get("nodes");
+				Iterator<JSONObject> nodeIterator = nodes.iterator();
+				att = new int[nodes.size()][a];
+
+				int nodeCounter = 0;
+				while (nodeIterator.hasNext()) {
+					JSONObject node = nodeIterator.next();
+					JSONArray label = (JSONArray) node.get("labels");
+					att[nodeCounter][0] = ((Long) label.get(0)).intValue();
+					nodeCounter++;
+				}
+				// nodes, labels, first elementy of array
 				this.msrc21[j] = msrcEdge;
-				//System.out.println(msrcEdge);
-				//System.out.println(edges);
-				/*double[][] d = read();
+				this.msrc21atts[j] = att;
 
-				// needs to be an edge list or something
-
-				// add edges to graph
-				int edgeCounter = 0;
-
-				for (int i = 0; i < d.length; i++) {
-					if (d[i][0] < n && d[i][1] < n) {
-						msrcEdge.addEdge(new MyEdge(edgeCounter, 1.0), ((int) (d[i][0])), ((int) (d[i][1])), EdgeType.UNDIRECTED);
-						edgeCounter++;
-					}
-				}*/
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -978,5 +977,9 @@ public class Sociopatterns {
 
 	public Graph[] getMSRC21Graphs() {
     	return this.msrc21;
+	}
+
+	public int[][] getMSRC21Attrs(int index) {
+    	return this.msrc21atts[index];
 	}
 }

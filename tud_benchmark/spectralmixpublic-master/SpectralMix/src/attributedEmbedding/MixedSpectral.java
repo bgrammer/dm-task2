@@ -14,9 +14,9 @@ import edu.uci.ics.jung.graph.util.Pair;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Random;
-import java.util.Vector;
+import java.lang.reflect.Array;
+import java.util.*;
+
 import nature.IO;
 import nature.Visualization;
 
@@ -45,8 +45,10 @@ public class MixedSpectral {
     int extraiter; 	//extra iterations
     static boolean writeResult = true;
     static boolean verbose = true;
+    private int graphNo;
 
-    public MixedSpectral(String dataset, Graph[] g, boolean[] weighted, int[][] attributes, int numAtt, int d, int iter, int extraiter, int[] classId) {
+    public MixedSpectral(String dataset, Graph[] g, boolean[] weighted, int[][] attributes, int numAtt, int d, int iter, int extraiter, int[] classId, int graphNo) {
+        this.graphNo = graphNo;
         this.dataset = dataset;
     	this.g = g;
         this.attributes = attributes;
@@ -60,24 +62,21 @@ public class MixedSpectral {
         numObj = g[0].getVertexCount();
         numCat = 0;
         for (int i = 0; i < numAtt; i++) {
-            Vector<Integer> cc = new Vector<Integer>();
+
+            numCat = 25;
+            int[] counts = new int[numCat];
+            Arrays.fill(counts,0);
+
+            Map<Integer, Integer> countByAttribute = new HashMap<>();
             for (int j = 0; j < numObj; j++) {
-                if (!cc.contains(attributes[j][i])) {
-                    cc.add(attributes[j][i]);               }
+                Integer new_key = attributes[j][i];
+                countByAttribute.put(new_key, countByAttribute.getOrDefault(new_key, 0) +1);
             }
-                     
-            int numCati = cc.size();
-            
-            if(dataset.equals("brainA"))
-            	numCati=7;
-            
-            numCat += numCati;
-            int[] counts = new int[numCati];
-            for (int j = 0; j < numObj; j++) {
-                if (attributes[j][i] != -1) {
-                   counts[attributes[j][i]]++;
-                }
+
+            for (Map.Entry<Integer,Integer> nodeCount : countByAttribute.entrySet()) {
+                counts[nodeCount.getKey()] = nodeCount.getValue();
             }
+
             catCount[i] = new CountPack(counts);
         }
         objCoord = new double[numObj][d];
@@ -96,9 +95,7 @@ public class MixedSpectral {
         double maxWeight = 0.0;
         int maxIndex = -1;
         for (int i = 0; i < g.length; i++) {
-            System.out.println(i);
-            System.out.println(g.length);
-            System.out.println(g[0]);
+
             Collection<MyEdge> e = g[i].getEdges();
             for (MyEdge ee : e) {
                 overallWeight[i] += ee.getWeight();
@@ -140,7 +137,7 @@ public class MixedSpectral {
     
     //init object coordinates randomly and category coords at the center of all assigned objects
     public void init(int seed) {
- 
+        System.out.println(catCount);
         Random r = new Random(seed);
         for (int i = 0; i < numObj; i++) {
             for (int j = 0; j < d; j++) {
@@ -206,8 +203,8 @@ public class MixedSpectral {
         
         if (writeResult) {
             IO ea = new IO();
-            ea.writeDoubleToMatlab(objCoord, "objCoord", "embeddings/objCoord-"+dataset+"-"+d+"D-"+iter+"e"+extraiter);
-//            ea.writeDoubleToMatlab(catCoord, "catCoord", "embeddings/objCat-"+dataset+"-"+d+"D-"+iter+"e"+extraiter); // if we want coordinates of attributes
+            ea.writeDoubleToMatlab(objCoord, "objCoord", "embeddings/objCoord-"+dataset+"-"+d+"D-"+iter+"e"+extraiter+"g"+graphNo);
+            ea.writeDoubleToMatlab(catCoord, "catCoord", "embeddings/objCat-"+dataset+"-"+d+"D-"+iter+"e"+extraiter+"g"+graphNo); // if we want coordinates of attributes
         }
 
     }
@@ -359,7 +356,6 @@ public class MixedSpectral {
                 Pair<Integer> p = g[i].getEndpoints(e);
                 double dist = 0.0;
                 for (int l = 0; l < d; l++) {
-                    System.out.println(p);
                     dist += weightFactors[i] * (e.getWeight() * (objCoord[p.getFirst()][l] - objCoord[p.getSecond()][l]) * (objCoord[p.getFirst()][l] - objCoord[p.getSecond()][l]));
                 }
                 cost[i] += dist;

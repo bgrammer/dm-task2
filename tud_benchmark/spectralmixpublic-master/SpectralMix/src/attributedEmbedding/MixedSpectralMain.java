@@ -37,7 +37,7 @@ public class MixedSpectralMain {
         int dimensionality = 0;
         int iter = 0;
         int extraiter = 0;
-                
+        Graph[] msrc21graphs = null;
         Graph[] measuredDiary = new Graph[noG];
         // we only have 1 graph
 
@@ -93,7 +93,7 @@ public class MixedSpectralMain {
 			System.out.println("Read Synthetic Data Network - A");
 		}
 		else if (dataset.equals("msrc21")) {
-			measuredDiary[0] = sp.getMSRC21Graphs()[0];
+			msrc21graphs = sp.getMSRC21Graphs();
 		}
 
         //For synthetic dataset
@@ -101,7 +101,7 @@ public class MixedSpectralMain {
 
         int noAtts = sp.getA(); 		//attributes number  
         //int[][] attA = sp.getAllAtt(); 	//if dataset has attributes, get values for all attributes
-        int[][] attA = null; 			//if dataset does not have attributes
+        //int[][] attA = null; 			//if dataset does not have attributes
                      
         boolean[] weighted = new boolean[noG];
                
@@ -109,18 +109,22 @@ public class MixedSpectralMain {
         	weighted[i] = false;            //set if the edges have weights or not
         }
         
-        dimensionality = 10; //sp.getDim();
-        iter = 30; //sp.getIterations();
+        dimensionality = 100; //sp.getDim();
+        iter = 50; //sp.getIterations();
         extraiter = 5;// sp.getExtraIter();
       
         System.out.println("Start running, "+dataset+", for dimensionality d = "+dimensionality+".");
         long startTime = System.nanoTime();
-        System.out.println(measuredDiary[0]);
-		System.out.println(measuredDiary[0].getSuccessors(0));
-        MixedSpectral ms = new MixedSpectral(dataset, measuredDiary, weighted, attA, noAtts, dimensionality, iter, extraiter, sp.getClassId()); 
-	    ms.init(0);
-	    ms.run();
-	        
+
+        int index = 0;
+		for (Graph graph : msrc21graphs) {
+			measuredDiary[0] = graph;
+			MixedSpectral ms = new MixedSpectral(
+					dataset, measuredDiary, weighted, sp.getMSRC21Attrs(index), noAtts, dimensionality, iter, extraiter, sp.getClassId(),index);
+			ms.init(0);
+			ms.run();
+			index++;
+		}
 	    long endTime = System.nanoTime();
 	
 	    long duration = (endTime - startTime);  	    	
