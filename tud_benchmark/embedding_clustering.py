@@ -6,6 +6,18 @@ from sklearn.metrics import normalized_mutual_info_score
 import numpy as np
 import sklearn
 
+def nrkmeans_batch(data, labels, runs = 5, clusters = 20):
+    '''
+    Get dict of arrays, return dict of nmis
+    '''
+    nmis = []
+    y_preds = []
+    for i in range(0,runs):
+        nrkm = nrkmeans.NrKmeans(n_clusters=[clusters,1], allow_larger_noise_space=True)
+        nrkm.fit(data, best_of_n_rounds=10)
+        nmis.append(normalized_mutual_info_score(nrkm.labels[0],labels))
+    return np.mean(nmis)
+
 def kmeans_batch(data,labels,runs):
     nmis = []
     for i in range(0,runs):

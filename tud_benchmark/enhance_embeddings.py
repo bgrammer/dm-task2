@@ -46,7 +46,6 @@ def enhance_embeddings(G,node2vec_embeddings,spectralmix_aggr,spectralmix_aggr_a
     node2vec_enhanced["sd_all_label_pagerank_hist"] = np.hstack([node2vec_embeddings["sd"],clustering_label_hist_all,node_label_hist,clique_hist,pagerank_label_hist_all])
     node2vec_enhanced["mean_all_hist_all_properties"] = np.hstack([node2vec_embeddings["mean"],no_nodes,no_edges,clique_hist,node_label_hist,tree_widths,connectivities,degree_hist,pagerank_hist,
                                                              clustering_label_hist_all,pagerank_label_hist_all])
-
     sm_enhanced = {}
 
     #All graph properties without node label information
@@ -92,4 +91,8 @@ def enhance_embeddings(G,node2vec_embeddings,spectralmix_aggr,spectralmix_aggr_a
 
     sm_enhanced_attr["mean_all_hist_all_properties"] = np.hstack([spectralmix_aggr_attr["mean"],no_nodes,no_edges,clique_hist,node_label_hist,tree_widths,connectivities,degree_hist,pagerank_hist,
                                                              clustering_label_hist_all,pagerank_label_hist_all])
-    return node2vec_enhanced,sm_enhanced, sm_enhanced_attr
+
+    node_labels_only = {"no_embedding_labels_only" : node_label_hist}
+
+
+    return node2vec_enhanced,sm_enhanced, sm_enhanced_attr, node_labels_only

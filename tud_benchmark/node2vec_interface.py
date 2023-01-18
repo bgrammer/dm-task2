@@ -1,6 +1,7 @@
 import networkx as nx
 import gensim
 from node2vec import Node2Vec
+import os
 
 def generate_node2vec(G, embedding_dims = 64, walk_length = 30, num_walks = 200, p = 1, q = 1):
     G_node2vec = []
@@ -19,7 +20,7 @@ def generate_node2vec(G, embedding_dims = 64, walk_length = 30, num_walks = 200,
             model.wv.save(wv_filename)
             G_node2vec.append(model.wv.get_normed_vectors())
         else:
-            loaded_wv = KeyedVectors.load(wv_filename,mmap='r')
+            loaded_wv = gensim.models.KeyedVectors.load(wv_filename,mmap='r')
             G_node2vec.append(loaded_wv.get_normed_vectors())
     return G_node2vec
 
