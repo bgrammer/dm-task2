@@ -1,3 +1,5 @@
+This repository is a fork of the TUDataset repository (https://chrsmrrs.github.io/datasets/; see below for more information) made for an exploratory data analysis of the MSRC-21 dataset with the help of the node2vec and SpectralMix node embeddings. Please follow the installation instructions of TUDataSet, Node2vec (https://snap.stanford.edu/node2vec/) and SpectralMix (https://gitlab.cs.univie.ac.at/yllis19cs/spectralmixpublic) to run the code. Additional required packages are included in the Jupyter notebook, the most recent versions of them should work.
+
 # TUDataset
 
 Source code for our ICML 2020 Workshop on Graph Representation Learning and Beyond (GRL+ 2020) paper "[TUDataset: A collection of benchmark datasets for learning with graphs](https://grlplus.github.io/papers/79.pdf)". This repository contains graph kernel and GNN baseline implementations, data loaders, and evaluations scripts.
