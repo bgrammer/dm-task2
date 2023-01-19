@@ -1,6 +1,7 @@
 from networkx.readwrite import json_graph
 from copy import deepcopy
 import json
+from scipy.io import loadmat
 
 def export_nx_to_json(G):
     for i,graph in enumerate(G):
@@ -15,7 +16,6 @@ def export_nx_to_json(G):
             file.write(s)
 
 
-from scipy.io import loadmat
 
 def load_mat_obj(G):
     spectralmix_embeddings = []
